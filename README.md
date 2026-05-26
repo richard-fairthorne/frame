@@ -4,31 +4,112 @@ A full-stack, multiplatform app framework in Rust with GPU-native rendering via 
 
 > **Warning:** Frame is pre-0.1. The API surface is **not stable** and will change. Do not use in production.
 
-## Quick Start
+## Tutorial
+
+### 1. Create a new app
+
+```bash
+cargo new my-app && cd my-app
+```
+
+Add Frame to `Cargo.toml`:
 
 ```toml
 [dependencies]
-frame = "0.1"
+frame = { path = "../path/to/frame/crates/frame" }
 ```
 
-```rust
-use frame::prelude::*;
+### 2. Write your first app
 
+Replace `src/main.rs` with:
+
+```rust
+#![allow(unused_braces)]
+
+use frame::{rsx, run_app, AppBuilder, Text, Column, Color};
+
+#[frame::main]
 fn main() {
-    frame::run_app(
-        AppBuilder::new().title("My App").size(800.0, 600.0),
-        || {
-            let count = Signal::new(0);
-            rsx! {
-                <Column gap={8.0}>
-                    <Text size={24.0}>"Count: {count.get()}"</Text>
-                    <Button label="Increment" on_click={move || count.set(count.get() + 1)} />
+    run_app(
+        AppBuilder::new().title("My App").size(400.0, 300.0),
+        || Box::new(rsx! {
+            <Column gap=16.0>
+                <Text size=32.0 color=Color::BLACK>"Hello, Frame!"</Text>
+            </Column>
+        }),
+    );
+}
+```
+
+Run it:
+
+```bash
+cargo run                    # macOS / Linux / Windows
+cargo frame run --target web # Web
+```
+
+### 3. Add interactivity
+
+```rust
+#![allow(unused_braces)]
+
+use frame::{rsx, run_app, request_render, AppBuilder, Text, Column, Button, Color, Signal};
+
+#[frame::main]
+fn main() {
+    let count = Signal::new(0);
+
+    run_app(
+        AppBuilder::new().title("Counter").size(400.0, 300.0),
+        move || {
+            let count = count.clone();
+            Box::new(rsx! {
+                <Column gap=20.0>
+                    <Text size=28.0>"Counter"</Text>
+                    <Text size=22.0>{format!("Count: {}", count.get())}</Text>
+                    <Button
+                        label="+ Increment"
+                        on_click={
+                            let count = count.clone();
+                            move || { count.set(count.get() + 1); request_render(); }
+                        }
+                        background=Color::from_u8(0, 122, 255, 255)
+                        padding=12.0
+                    />
                 </Column>
-            }
+            })
         },
     );
 }
 ```
+
+### 4. Add navigation
+
+```rust
+use frame::{Router, Navigator, DeepLinkConfig};
+
+let router = Router::new()
+    .route("/")
+    .route("/users/:id")
+    .route("/settings/:section");
+
+let navigator = Navigator::new(router);
+navigator.push("/users/42");
+
+match navigator.resolve_current() {
+    Some(route) => println!("Matched route {}", route.route_index),
+    None => println!("No match"),
+}
+```
+
+### Key concepts
+
+- **`#[frame::main]`** — Attribute macro that generates the correct platform entry point. One `main.rs` compiles on all 6 platforms.
+- **`run_app(builder, factory)`** — Starts the app. `factory` is a closure that returns your root widget. Called each frame to rebuild the widget tree.
+- **`rsx!`** — JSX-like syntax for declaring widget trees. Angle-bracket components, brace-delimited expressions.
+- **`Signal<T>`** — Reactive state. Call `.get()` to read, `.set()` to write. Changes trigger a re-render via `request_render()`.
+- **Widgets** — `Text`, `Column`, `Row`, `Button`, `Container`, `Stack`, `ScrollView`, `TextField`, `Slider`, `Checkbox`, `Switch`, `Grid`, `Card`, `ListView`, `Icon`, `Image`, and more.
+- **`Box::new(rsx! { ... })`** — The `rsx!` macro produces a widget value. Wrap in `Box::new()` to return `Box<dyn Widget>` from the factory closure.
 
 ## Architecture
 
@@ -49,7 +130,6 @@ fn main() {
 | **Windows** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Linux** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Web** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-
 
 ## Crate Structure
 
@@ -90,18 +170,15 @@ cargo frame generate-association-files  # Deep link files
 ```rust
 let count = Signal::new(0);
 
-// Automatic dependency tracking
 let doubled = Computed::new(move || count.get() * 2);
 
-// Side effects re-run when dependencies change
 Effect::new(move || {
     println!("Count is now: {}", count.get());
 });
 
-// Batched updates — only one re-render
 batch(|| {
     count.set(1);
-    count.set(2); // intermediate value skipped
+    count.set(2);
 });
 ```
 
