@@ -53,6 +53,29 @@ pub use frame_macros::view;
 
 pub use frame_macros::frame_main as main;
 
+#[cfg(target_os = "android")]
+pub use android_activity::AndroidApp;
+
+#[cfg(target_os = "android")]
+pub mod android {
+    use std::sync::OnceLock;
+
+    static ANDROID_APP: OnceLock<android_activity::AndroidApp> = OnceLock::new();
+
+    pub fn set_app(app: android_activity::AndroidApp) {
+        ANDROID_APP.set(app).ok();
+    }
+
+    pub fn take_app() -> Option<android_activity::AndroidApp> {
+        ANDROID_APP.take()
+    }
+}
+
+#[cfg(not(target_os = "android"))]
+pub mod android {
+    pub struct AndroidApp;
+}
+
 mod platform {
     use frame_core::traits::widget::Widget;
 
@@ -133,12 +156,35 @@ mod platform {
             frame_linux::run_app(lb, root_factory);
         }
 
+        #[cfg(target_os = "ios")]
+        {
+            let mut ib = frame_ios::AppBuilder::new()
+                .title(&builder.title)
+                .size(builder.width, builder.height)
+                .resizable(builder.resizable);
+            for plugin in plugins {
+                ib = ib.plugin(plugin);
+            }
+            frame_ios::run_app(ib, root_factory);
+        }
+
         #[cfg(target_os = "android")]
         {
-            let _ = (builder, root_factory, plugins);
-            eprintln!("On Android, use android_main() with frame_android::run_app_with() instead of run_app().");
-            eprintln!("See examples/counter/src/lib.rs for the pattern.");
-            std::process::exit(1);
+            match crate::android::take_app() {
+                Some(app) => {
+                    let mut ab = frame_android::AppBuilder::new()
+                        .title(&builder.title)
+                        .size(builder.width, builder.height);
+                    for plugin in plugins {
+                        ab = ab.plugin(plugin);
+                    }
+                    frame_android::run_app_with(app, ab, root_factory);
+                }
+                None => {
+                    eprintln!("frame: Android app not initialized. Use #[frame::main] or call frame::android::set_app().");
+                    std::process::exit(1);
+                }
+            }
         }
 
         #[cfg(target_os = "windows")]
@@ -164,7 +210,7 @@ mod platform {
             frame_web::run_app(wb, root_factory);
         }
 
-        #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "android", target_os = "windows", target_arch = "wasm32")))]
+        #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "ios", target_os = "android", target_os = "windows", target_arch = "wasm32")))]
         {
             let _ = (builder, root_factory, plugins);
             unimplemented!("Frame: platform not yet supported.");

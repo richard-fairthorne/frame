@@ -27,6 +27,7 @@ frame-ios = { path = "../frame-ios" }
 
 [target.'cfg(target_os = "android")'.dependencies]
 frame-android = { path = "../frame-android" }
+android-activity = { version = "0.6", features = ["native-activity"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 frame-windows = { path = "../frame-windows" }
