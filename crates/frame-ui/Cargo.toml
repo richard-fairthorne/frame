@@ -1,0 +1,9 @@
+[package]
+name = "frame-ui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frame-core = { path = "../frame-core" }
+frame-rendering = { path = "../frame-rendering" }
+frame-layout = { path = "../frame-layout" }

@@ -1,0 +1,15 @@
+[package]
+name = "frame-rendering"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frame-core = { path = "../frame-core" }
+parley = "0.9"
+swash = "0.2"
+vello = "0.4"
+wgpu = "24"
+
+[dev-dependencies]
+frame-ui = { path = "../frame-ui" }
+slotmap = "1"

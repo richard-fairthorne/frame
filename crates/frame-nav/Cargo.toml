@@ -1,0 +1,7 @@
+[package]
+name = "frame-nav"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frame-core = { path = "../frame-core" }

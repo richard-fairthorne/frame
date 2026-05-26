@@ -1,0 +1,11 @@
+[package]
+name = "frame-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frame-core = { path = "../frame-core" }
+frame-rendering = { path = "../frame-rendering" }
+
+[dev-dependencies]
+frame-ui = { path = "../frame-ui" }

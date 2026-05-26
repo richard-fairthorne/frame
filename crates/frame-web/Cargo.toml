@@ -1,0 +1,25 @@
+[package]
+name = "frame-web"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frame-core = { path = "../frame-core" }
+slotmap = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+frame-rendering = { path = "../frame-rendering" }
+frame-input = { path = "../frame-input" }
+wasm-bindgen = "=0.2.97"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "Window", "Document", "HtmlCanvasElement", "Element",
+    "Event", "MouseEvent", "KeyboardEvent", "TouchEvent",
+    "Performance", "BeforeUnloadEvent", "EventTarget",
+    "TouchList", "Touch",
+] }
+wgpu = { version = "24", features = ["webgpu"] }
+vello = "0.4"
+raw-window-handle = "0.6"
+getrandom = { version = "0.2", features = ["js"] }

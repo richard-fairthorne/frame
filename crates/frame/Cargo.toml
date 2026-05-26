@@ -1,0 +1,38 @@
+[package]
+name = "frame"
+version = "0.1.0"
+edition = "2021"
+description = "A full-stack multiplatform app framework in Rust"
+
+[dependencies]
+frame-core = { path = "../frame-core" }
+frame-rendering = { path = "../frame-rendering" }
+frame-layout = { path = "../frame-layout" }
+frame-ui = { path = "../frame-ui" }
+frame-macros = { path = "../frame-macros" }
+frame-nav = { path = "../frame-nav" }
+frame-input = { path = "../frame-input" }
+frame-window = { path = "../frame-window" }
+frame-lifecycle = { path = "../frame-lifecycle" }
+frame-animation = { path = "../frame-animation" }
+frame-a11y = { path = "../frame-a11y" }
+frame-theme = { path = "../frame-theme" }
+frame-assets = { path = "../frame-assets" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+frame-macos = { path = "../frame-macos" }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+frame-ios = { path = "../frame-ios" }
+
+[target.'cfg(target_os = "android")'.dependencies]
+frame-android = { path = "../frame-android" }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+frame-windows = { path = "../frame-windows" }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+frame-linux = { path = "../frame-linux" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+frame-web = { path = "../frame-web" }

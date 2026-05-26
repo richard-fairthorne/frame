@@ -1,0 +1,26 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/frame-core",
+    "crates/frame-layout",
+    "crates/frame-macros",
+    "crates/frame-rendering",
+    "crates/frame-macos",
+    "crates/frame-ios",
+    "crates/frame-android",
+    "crates/frame-windows",
+    "crates/frame-linux",
+    "crates/frame-web",
+    "crates/frame-theme",
+    "crates/frame-ui",
+    "crates/frame-nav",
+    "crates/frame-input",
+    "crates/frame-lifecycle",
+    "crates/frame-window",
+    "crates/frame-animation",
+    "crates/frame-a11y",
+    "crates/frame-assets",
+    "crates/frame",
+    "crates/cargo-frame",
+    "crates/frame-test",
+]
