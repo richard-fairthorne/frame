@@ -69,6 +69,22 @@ where
 
     crate::deep_link::register_app_links(&[]);
 
+    {
+        let vm_raw = android_app.vm_as_ptr() as *mut jni::sys::JavaVM;
+        let activity_raw = android_app.activity_as_ptr() as jni::sys::jobject;
+        crate::native_view_embed::set_jni_context(vm_raw, activity_raw);
+
+        let vm = unsafe {
+            jni::JavaVM::from_raw(vm_raw.cast())
+                .expect("frame-android: failed to get JavaVM")
+        };
+        let activity = unsafe { jni::objects::JObject::from_raw(activity_raw) };
+        if let Some(uri) = crate::deep_link::extract_intent_uri(&vm, &activity) {
+            eprintln!("frame-android: initial deep link: {uri}");
+            crate::deep_link::handle_deep_link(uri);
+        }
+    }
+
     let mut frame_app_builder = frame_core::FrameApp::builder();
     for plugin in builder.plugins {
         frame_app_builder = frame_app_builder.plugin(plugin);
